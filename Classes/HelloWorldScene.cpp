@@ -179,15 +179,15 @@ bool HelloWorld::isTouchInside(Sprite* sprite, Touch* touch)
 
 void HelloWorld::startMovingBackground()
 {
-	log("start moving");
+	log("start moving!");
 }
 
 void HelloWorld::stopMovingBackground()
 {
-	log("stop moving");
+	log("stop moving!");
 }
 
 void HelloWorld::moveBackground(float f)
 {
-	log("moving background");
+	log("moving background!");
 }
