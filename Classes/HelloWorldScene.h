@@ -14,7 +14,8 @@ public:
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 
-	
+	cocos2d::Layer *layer1;
+	cocos2d::Layer *layer2;
 	cocos2d::Sprite *Man;
 
 	cocos2d::Sprite *rightSprite;
@@ -42,6 +43,8 @@ public:
 	void stopMovingBackground();
 	void moveBackground(float f);
 
+	
+	void stopGame(Ref* sender);
 
 	void createMan();
 

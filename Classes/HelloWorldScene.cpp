@@ -1,6 +1,8 @@
 ﻿#include <string>
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include "TestScene3.h"
+#include "MainScreen.h"
 
 USING_NS_CC;
 
@@ -27,6 +29,14 @@ bool HelloWorld::init()
     {
         return false;
     }
+
+
+	layer1 = Layer::create();
+	this->addChild(layer1);
+	
+	layer2 = Layer::create();
+	this->addChild(layer2);
+
 	winSize = Director::getInstance()->getWinSize();
 	
 	this->createBackground();
@@ -34,10 +44,26 @@ bool HelloWorld::init()
 	this->createArrowButtons();
 
 
+	MenuItemFont *menuitem_exit = MenuItemFont::create("STOP GAME", CC_CALLBACK_1(HelloWorld::stopGame, this));
+	menuitem_exit->setColor(Color3B::BLACK);
+
+	Menu *menu = Menu::create( menuitem_exit , nullptr);
+
+	menu->setPosition(Vec2(240, 360));
+	menu->alignItemsVertically();
+	this->addChild(menu);
+
 	return true;
 }
 
 
+
+
+void HelloWorld::stopGame(Ref * sender)
+{
+	Scene *scene = MainScreen::createScene();
+	Director::getInstance()->replaceScene(scene);
+}
 
 void HelloWorld::createMan()
 {
@@ -56,7 +82,7 @@ void HelloWorld::createMan()
 
 	Man = Sprite::createWithSpriteFrameName("grossini_dance_01.png");
 	Man->setPosition(Vec2(240, 160));
-	this->addChild(Man);
+	layer1->addChild(Man);
 
 	Animation *animation = Animation::createWithSpriteFrames(animationFrames, 0.4f);
 	Animate *animate = Animate::create(animation);
@@ -66,35 +92,31 @@ void HelloWorld::createMan()
 
 void HelloWorld::createBackground()
 {
-	Layer *voidNode = Layer::create();
-
-
 	Sprite *background1 = Sprite::create("sea.jpg");
 	background1->setAnchorPoint(Vec2(0, 0));
 	background1->setPosition(Vec2(0, 0));
 
-	voidNode->addChild(background1);
-	this->addChild(voidNode);
+	layer1->addChild(background1);
 }
 
 void HelloWorld::createArrowButtons()
 {
 	leftSprite = Sprite::create("b1.png");
 	leftSprite->setPosition(Vec2(180, 30));
-	this->addChild(leftSprite, 2);
+	layer2->addChild(leftSprite, 2);
 
 	leftPressedSprite = Sprite::create("b2.png");
 	leftPressedSprite->setPosition(leftSprite->getPosition());
-	this->addChild(leftPressedSprite, 1);
+	layer2->addChild(leftPressedSprite, 1);
 
 	rightSprite = Sprite::create("f1.png");
 	rightSprite->setPosition(Vec2(300, 30));
-	this->addChild(rightSprite, 2);
+	layer2->addChild(rightSprite, 2);
 
 	rightPressedSprite = Sprite::create("f2.png");
 	rightPressedSprite->setPosition(rightSprite->getPosition());
 
-	this->addChild(rightPressedSprite, 1);
+	layer2->addChild(rightPressedSprite, 1);
 }
 
 void HelloWorld::onEnter()
@@ -179,15 +201,48 @@ bool HelloWorld::isTouchInside(Sprite* sprite, Touch* touch)
 
 void HelloWorld::startMovingBackground()
 {
-	log("start moving!");
+	if(isLeftPressed&&isRightPressed)
+	{
+		return;
+	}
+
+	log("start moving");
+	this->schedule(schedule_selector(HelloWorld::moveBackground));
 }
 
 void HelloWorld::stopMovingBackground()
 {
 	log("stop moving!");
+	this->unschedule(schedule_selector(HelloWorld::moveBackground));
 }
 
 void HelloWorld::moveBackground(float f)
 {
-	log("moving background!");
+	int moveStep = 3;
+
+	if (isLeftPressed)
+	{
+		moveStep = -3;
+		Man->setFlippedX(false);
+	}
+	else
+	{
+		moveStep = 3;
+		Man->setFlippedX(true);
+	}
+
+	Vec2 newPosition = Vec2(Man->getPosition().x + moveStep, Man->getPosition().y);
+
+	if (newPosition.x < 0)
+	{
+		newPosition.x = 0;
+	}
+	else if (newPosition.x > 1280)
+	{
+		newPosition.x = 1280;
+	}
+
+	Man->setPosition(newPosition);
+	layer1->runAction(Follow::create(Man, Rect(0, 0, 1028, 720)));
 }
+
